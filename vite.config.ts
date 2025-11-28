@@ -4,20 +4,23 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
+    const desiredPort = Number(env.VITE_PORT ?? env.PORT ?? 5173);
+    const isDev = mode === 'development';
     return {
       server: {
-        port: 3000,
+        port: desiredPort,
         host: '0.0.0.0',
       },
       plugins: [react()],
-      define: {
+      define: isDev ? {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
         'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
-      },
+      } : {},
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),
-        }
+        },
+        dedupe: ['react', 'react-dom']
       }
     };
-});
+  });
